@@ -20,7 +20,15 @@ dadmom
 # Tidied data
 
 ```{r}
-# write your code to tidy the data here
+# tidying the data
+dadmom %>%
+ unite(dad, named, incd, sep = "-") %>%
+  unite(mom, namem, incm, sep = "-") %>%
+  gather(dad, mom, key = role, value = name) %>%
+  separate(name, into = c("Name", "inc"))
+  
+
+
 ```
 
 ## Session info
