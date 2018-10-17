@@ -1,6 +1,6 @@
 ---
 title: "Exploring U.S. Supreme Court Decisions"
-author: "Your name"
+author: "Abby Bergman"
 output: github_document
 ---
 
@@ -11,8 +11,8 @@ output: github_document
 library(tidyverse)
 
 # load data
-scdbv_mod <- read_csv("data/SCDB_2018_01_justiceCentered_Citation.csv")
-scdbv_leg <- read_csv("data/SCDB_Legacy_04_justiceCentered_Citation.csv")
+scdbv_mod <- read_csv("data/SCDB_2018_01_justiceCentered_Citation.csv", guess_max = 100000)
+scdbv_leg <- read_csv("data/SCDB_Legacy_04_justiceCentered_Citation.csv", guess_max = 100000)
 scdbv_mod
 scdbv_leg
 ```
@@ -20,7 +20,8 @@ scdbv_leg
 ## Combine the datasets
 
 ```{r}
-# scdbv <- # add your code here
+scdbv <- bind_rows(scdbv_leg, scdbv_mod)
+
 ```
 
 ## Recode variables as you find necessary
@@ -32,6 +33,10 @@ scdbv_leg
 ## What percentage of cases in each term are decided by a one-vote margin (i.e. 5-4, 4-3, etc.)
 
 ```{r}
+scdbv %>%
+  mutate(margin = majVotes-minVotes) %>%
+  select(caseId, term, majVotes, minVotes, margin) %>%
+#do it in a way where it shows unique obs
 
 ```
 
