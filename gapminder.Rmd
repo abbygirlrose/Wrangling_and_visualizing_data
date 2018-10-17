@@ -33,25 +33,13 @@ inner_join(gapminder, hiv) %>%
 # Which continents have the most countries with missing HIV data?
 
 ```{r}
-gapminder_new %>%
-group_by("continent") 
+left_join(gapminder, hiv) %>%
+  filter(is.na(hivRate))%>%
+  count(continent) %>%
+  ggplot(aes(fct_reorder(continent, -n), n)) + geom_col()
 
-anti_join(gapminder, hiv)
 
-gapminder_new %>%
-  filter(is.na(hivRate))
 
-na_count1 <- sum(is.na(gapminder_new)) 
-
-gapminder_new %>%
-  select(everything()) %>%  
-  summarise_all(funs(sum(is.na(.))))
-
-gapminder_new %>%
-  rowwise %>%
-  summarise(NA_per_row = sum(is.na()))
-
-apply(gapminder_new, MARGIN = 1, function(x) sum(is.na(x)))
 ```
 
 
