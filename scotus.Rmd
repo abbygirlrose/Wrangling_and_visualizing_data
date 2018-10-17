@@ -36,21 +36,27 @@ scdbv <- bind_rows(scdbv_leg, scdbv_mod)
 scdbv2 <- scdbv %>%
   mutate(margin = majVotes-minVotes) %>% #create margin column
   select(caseId, term, majVotes, minVotes, margin) %>% #select only the terms I want
-  unique() #extract unique obs
+  unique() %>%
+  group_by(term)
 
-
-count(scdbv2, margin) %>% #count number of cases for each margin
-  mutate(percent = n / sum(n))%>% #make percent column
-  ggplot(aes(margin, percent))+ geom_col() + labs(title = "Percentages For Each Vote Margin", x = "Vote Margin", y = "Percentage")
 
 #this is wrong but im going to leave for now
-
+# what im missing is some way to summarize each term
+scdbv2%>%
+  count(margin) %>% 
+  mutate(percent = n / sum(n))%>%
+  filter(margin == 1) %>%
+  ggplot(aes(term, percent))+ geom_line() + labs(title = "Percentages For Each Vote Margin", x = "Term", y = "Percentage")
 
 ```
 
 ## In each term he served on the Court, in what percentage of cases was Justice Antonin Scalia in the majority?
 
 ```{r}
+scdbv %>%
+  select(caseId, term, majVotes, minVotes, justice, majority, justiceName) %>%
+  filter(term > 1985)
+  
 
 ```
 
