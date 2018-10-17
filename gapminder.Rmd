@@ -18,30 +18,40 @@ gapminder
 ```{r}
 library(readr)
 hiv <- read_csv("data/gapminder_hiv.csv")
-hiv
-
-SCDB2018 <- read_csv("data/SCDB_2018_01_justiceCentered_Citation.csv")
-
-SCDB_leg04 <- read_csv("data/SCDB_Legacy_04_justiceCentered_Citation.csv")
 
 ```
 
 # What is the relationship between HIV prevalence and life expectancy?
 
 ```{r}
-#do inner join to add rate column
-gapminder_new <- inner_join(gapminder, hiv)
-
-#make plot
-ggplot(gapminder, aes("lifeExp", "hivRate")) + geom_point()
+#do full join to add rate column
+inner_join(gapminder, hiv) %>% 
+  ggplot(aes(hivRate, lifeExp)) + geom_point()+ geom_smooth()
 
 ```
 
 # Which continents have the most countries with missing HIV data?
 
 ```{r}
+gapminder_new %>%
+group_by("continent") 
 
+anti_join(gapminder, hiv)
 
+gapminder_new %>%
+  filter(is.na(hivRate))
+
+na_count1 <- sum(is.na(gapminder_new)) 
+
+gapminder_new %>%
+  select(everything()) %>%  
+  summarise_all(funs(sum(is.na(.))))
+
+gapminder_new %>%
+  rowwise %>%
+  summarise(NA_per_row = sum(is.na()))
+
+apply(gapminder_new, MARGIN = 1, function(x) sum(is.na(x)))
 ```
 
 
