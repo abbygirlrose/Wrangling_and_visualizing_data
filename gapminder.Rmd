@@ -16,16 +16,32 @@ gapminder
 # Import the HIV data
 
 ```{r}
+library(readr)
+hiv <- read_csv("data/gapminder_hiv.csv")
+hiv
+
+SCDB2018 <- read_csv("data/SCDB_2018_01_justiceCentered_Citation.csv")
+
+SCDB_leg04 <- read_csv("data/SCDB_Legacy_04_justiceCentered_Citation.csv")
+
 ```
 
 # What is the relationship between HIV prevalence and life expectancy?
 
 ```{r}
+#do inner join to add rate column
+gapminder_new <- inner_join(gapminder, hiv)
+
+#make plot
+ggplot(gapminder, aes("lifeExp", "hivRate")) + geom_point()
+
 ```
 
 # Which continents have the most countries with missing HIV data?
 
 ```{r}
+
+
 ```
 
 
