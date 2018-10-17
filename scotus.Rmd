@@ -33,10 +33,18 @@ scdbv <- bind_rows(scdbv_leg, scdbv_mod)
 ## What percentage of cases in each term are decided by a one-vote margin (i.e. 5-4, 4-3, etc.)
 
 ```{r}
-scdbv %>%
-  mutate(margin = majVotes-minVotes) %>%
-  select(caseId, term, majVotes, minVotes, margin) %>%
-#do it in a way where it shows unique obs
+scdbv2 <- scdbv %>%
+  mutate(margin = majVotes-minVotes) %>% #create margin column
+  select(caseId, term, majVotes, minVotes, margin) %>% #select only the terms I want
+  unique() #extract unique obs
+
+
+count(scdbv2, margin) %>% #count number of cases for each margin
+  mutate(percent = n / sum(n))%>% #make percent column
+  ggplot(aes(margin, percent))+ geom_col() + labs(title = "Percentages For Each Vote Margin", x = "Vote Margin", y = "Percentage")
+
+#this is wrong but im going to leave for now
+
 
 ```
 
