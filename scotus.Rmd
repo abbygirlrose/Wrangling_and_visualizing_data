@@ -27,21 +27,21 @@ scdbv <- bind_rows(scdbv_leg, scdbv_mod)
 ## Recode variables as you find necessary
 
 ```{r}
-
+#create margin column
+scdbv2 <- scdbv %>%
+  mutate(margin = majVotes-minVotes) 
 ```
 
 ## What percentage of cases in each term are decided by a one-vote margin (i.e. 5-4, 4-3, etc.)
 
 ```{r}
+
 scdbv2 <- scdbv %>%
   mutate(margin = majVotes-minVotes) %>% #create margin column
   select(caseId, term, majVotes, minVotes, margin) %>% #select only the terms I want
   unique() %>%
   group_by(term)
 
-
-#this is wrong but im going to leave for now
-# what im missing is some way to summarize each term
 scdbv2%>%
   count(margin) %>% 
   mutate(percent = n / sum(n))%>%
@@ -55,7 +55,7 @@ scdbv2%>%
 ```{r}
 scdbv %>%
   select(caseId, term, majVotes, minVotes, justice, majority, justiceName) %>%
-  filter(term > 1985)
+  filter(term > 1985, term < 2017) #this isnt working
   
 
 ```
@@ -63,19 +63,46 @@ scdbv %>%
 ## Create a graph similar to above that compares the percentage for all cases versus non-unanimous cases (i.e. there was at least one dissenting vote)
 
 ```{r}
+scdbv3 <- scdbv %>%
+  select(caseId, term, majVotes, minVotes, justice, majority, justiceName) %>%
+  mutate(margin = majVotes-minVotes)
+
+scdbv3%>%
+  count(margin) %>% 
+  mutate(percent = n / sum(n))%>%
+  filter(margin == 0)
 
 ```
 
 ## In each term, what percentage of cases were decided in the conservative direction?
 
 ```{r}
+scdbv4 <- scdbv %>%
+  select(term, caseId, partyWinning, decisionDirection) %>% #select only the terms I want
+  unique() %>%
+  group_by(term)
 
+scdbv4%>%
+  count(decisionDirection) %>% 
+  mutate(percent = n / sum(n))%>%
+  filter(decisionDirection == 1) %>%
+  ggplot(aes(term, percent))+ geom_line() + labs(title= "Percent of US Supreme Court Cases Won in a Conservative Direction", x = "Term", y = "Percent of Cases")
 ```
 
 ## In each term, how many of the term's published decisions were announced in a given month?
 
 ```{r}
+scdbv %>%
+  unique()%>%
+  select(term, dateDecision) %>%
+  mutate(Month = dateDecision) %>%
+  separate(Month, into = c("month", "day", "year")) %>%
+  select(term, dateDecision, month) %>%
+  mutate(month =factor(month, levels = c(1:12), labels = c(month.abb)))%>%
+  count(term, month) %>%
+  ggplot(aes(month, n)) + geom_boxplot() +coord_flip()
 
+#this is still wrong but I'm close
 ```
 
 ## The Chief Justice is frequently seen as capable of influencing the ideological direction of the Court. Create a graph similar to the one above that also incorporates information on who was the Chief Justice during the term.
