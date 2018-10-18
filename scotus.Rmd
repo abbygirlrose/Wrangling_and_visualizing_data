@@ -46,7 +46,7 @@ scdbv2%>%
   count(margin) %>% 
   mutate(percent = n / sum(n))%>%
   filter(margin == 1) %>%
-  ggplot(aes(term, percent))+ geom_line() + labs(title = "Percentages For Each Vote Margin", x = "Term", y = "Percentage")
+  ggplot(aes(term, percent))+ geom_line() + labs(title = "Percentage of Votes with a One Vote Margon", x = "Term", y = "Percentage") + scale_y_continuous(labels = scales::percent)
 
 ```
 
