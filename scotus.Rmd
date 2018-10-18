@@ -99,7 +99,7 @@ scdbv %>%
   separate(Month, into = c("month", "day", "year")) %>%
   select(term, dateDecision, month) %>%
   mutate(month =factor(month, levels = c(1:12), labels = c(month.abb)))%>%
-  count(term, month) %>%
+ count(term, month) %>%
   ggplot(aes(month, n)) + geom_boxplot() +coord_flip()
 
 #this is still wrong but I'm close
@@ -108,6 +108,16 @@ scdbv %>%
 ## The Chief Justice is frequently seen as capable of influencing the ideological direction of the Court. Create a graph similar to the one above that also incorporates information on who was the Chief Justice during the term.
 
 ```{r}
+scdbv4 <- scdbv %>%
+  select(term, caseId, partyWinning, decisionDirection, chief) %>% #select only the terms I want
+  unique() %>%
+  group_by(term, chief)
+
+scdbv4%>%
+  count(decisionDirection) %>% 
+  mutate(percent = n / sum(n))%>%
+  filter(decisionDirection == 1)  %>%
+  ggplot(aes(term, percent))+ geom_line()+ facet_wrap(~chief)
 
 ```
 
