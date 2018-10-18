@@ -65,13 +65,11 @@ scdbv %>%
 ```{r}
 scdbv3 <- scdbv %>%
   select(caseId, term, majVotes, minVotes, justice, majority, justiceName) %>%
-  mutate(margin = majVotes-minVotes)
+  mutate(margin = majVotes-minVotes) %>%
+  unique()
 
-scdbv3%>%
-  count(margin) %>% 
-  mutate(percent = n / sum(n))%>%
-  filter(margin == 0)
 
+filter(margin > 0)
 ```
 
 ## In each term, what percentage of cases were decided in the conservative direction?
@@ -117,7 +115,8 @@ scdbv4%>%
   count(decisionDirection) %>% 
   mutate(percent = n / sum(n))%>%
   filter(decisionDirection == 1)  %>%
-  ggplot(aes(term, percent))+ geom_line()+ facet_wrap(~chief)
+  ggplot(aes(x = term, y = percent))+ geom_line()+ facet_wrap(~chief)
+
 
 ```
 
