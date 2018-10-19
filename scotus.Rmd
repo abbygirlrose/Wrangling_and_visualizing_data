@@ -27,9 +27,9 @@ scdbv <- bind_rows(scdbv_leg, scdbv_mod)
 ## Recode variables as you find necessary
 
 ```{r}
-#create margin column
-scdbv2 <- scdbv %>%
-  mutate(margin = majVotes-minVotes) 
+scdbv <- scdbv %>%
+mutate(majority = majority -1, datadecisionDirection = ifelse(decisionDirection == 3, NA, decisionDirection -1), justiceName = as.factor(justiceName),
+         chief = as.factor(chief))
 ```
 
 ## What percentage of cases in each term are decided by a one-vote margin (i.e. 5-4, 4-3, etc.)
@@ -53,9 +53,16 @@ scdbv2%>%
 ## In each term he served on the Court, in what percentage of cases was Justice Antonin Scalia in the majority?
 
 ```{r}
+  
 scdbv %>%
-  select(caseId, term, majVotes, minVotes, justice, majority, justiceName) %>%
-  filter(term > 1985, term < 2017) #this isnt working
+  filter(justiceName == "AScalia")%>%
+  count(term, majority) %>%
+  na.omit() %>%
+  group_by(term) %>%
+  summarise(all_n = sum(n), 
+            all_maj = sum(n[majority==1])) %>%
+  mutate(n_pct = all_maj/all_n) %>%
+  ggplot(aes(term, n_pct)) + geom_line() + scale_y_continuous(labels=scales::percent, limits=c(0,NA)) +labs(title= "Percent of Time Scalia was in the Majority", x = "Term", y= "Percent of Total Decisions")
   
 
 ```
@@ -64,12 +71,20 @@ scdbv %>%
 
 ```{r}
 scdbv3 <- scdbv %>%
-  select(caseId, term, majVotes, minVotes, justice, majority, justiceName) %>%
-  mutate(margin = majVotes-minVotes) %>%
-  unique()
+  filter(justiceName == "AScalia")%>%
+  mutate(unani = ifelse(minVotes == 0,1,0)) %>%
+  count(term, majority, unani) %>%
+  na.omit() %>%
+  group_by(term) %>%
+  summarise(all_n = sum(n), all_maj = sum(n[majority==1]), nonUnani_maj = sum(n[majority==1 & unani==0 ]), nonUnani_n = sum(n[unani==0])) %>%
+  gather(key = key, value = value, -term) %>%
+  separate(key, into = c("type", "var"))%>%
+  spread(var, value)%>%
+  mutate(n_pct = maj/n, 
+         type = factor(type, levels = c("all", "nonUnani"), labels = c("All Decisions", "Non-Unanimous Decisions")))
+  
+ggplot(scdbv3, aes(term, n_pct, color=type))+geom_line()+scale_y_continuous(labels = scales::percent, limits=c(0,NA))+ labs(titles = "Percent of Time Scalia was in the Majority", x="Term", y = "Percent of Total Decisions")
 
-
-filter(margin > 0)
 ```
 
 ## In each term, what percentage of cases were decided in the conservative direction?
@@ -101,17 +116,31 @@ scdbv %>%
   ggplot(aes(month, n)) + geom_boxplot() +coord_flip()
 
 #this is still wrong but I'm close
+
+
+
+scdbv %>%
+  unique()%>%
+  select(term, dateDecision) %>%
+  mutate(Month = dateDecision) %>%
+  separate(Month, into = c("month", "day", "year")) %>%
+  select(term, dateDecision, month) %>%
+  mutate(month =factor(month, levels = c(1:12), labels = c(month.abb)))%>%
+  group_by(term)%>%
+ count(term, month) %>%
+  ggplot(aes(month, n, group= term)) + geom_boxplot() +coord_flip()
+
 ```
 
 ## The Chief Justice is frequently seen as capable of influencing the ideological direction of the Court. Create a graph similar to the one above that also incorporates information on who was the Chief Justice during the term.
 
 ```{r}
-scdbv4 <- scdbv %>%
+scdbv6 <- scdbv %>%
   select(term, caseId, partyWinning, decisionDirection, chief) %>% #select only the terms I want
   unique() %>%
   group_by(term, chief)
 
-scdbv4%>%
+scdbv6%>%
   count(decisionDirection) %>% 
   mutate(percent = n / sum(n))%>%
   filter(decisionDirection == 1)  %>%
