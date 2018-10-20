@@ -83,7 +83,7 @@ scdbv3 <- scdbv %>%
   mutate(n_pct = maj/n, 
          type = factor(type, levels = c("all", "nonUnani"), labels = c("All Decisions", "Non-Unanimous Decisions")))
   
-ggplot(scdbv3, aes(term, n_pct, color=type))+geom_line()+scale_y_continuous(labels = scales::percent, limits=c(0,NA))+ labs(titles = "Percent of Time Scalia was in the Majority", x="Term", y = "Percent of Total Decisions")
+ggplot(scdbv3, aes(term, n_pct, color=type))+geom_line()+scale_y_continuous(labels = scales::percent, limits=c(0,NA))+ labs(titles = "Percent of Time Scalia was in the Majority", x="Term", y = "Percent of Total Decisions") + theme(legend.position="bottom")
 
 ```
 
@@ -128,7 +128,7 @@ scdbv %>%
   mutate(month =factor(month, levels = c(1:12), labels = c(month.abb)))%>%
   group_by(term)%>%
  count(term, month) %>%
-  ggplot(aes(month, n, group= term)) + geom_boxplot() +coord_flip()
+  ggplot(aes(month, n)) + geom_boxplot() +coord_flip() 
 
 ```
 
