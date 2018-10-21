@@ -38,7 +38,7 @@ left_join(gapminder, hiv) %>%
   count(continent) %>%
   ggplot(aes(reorder(continent, -n), n)) + geom_col()+ labs(title = "Missing Observations by Country", x = "Continent", y = "Number of Missing Observations")
 
-
+print("Africa had the most missing observations")
 
 ```
 
