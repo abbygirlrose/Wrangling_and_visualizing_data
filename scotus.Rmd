@@ -62,7 +62,8 @@ scdbv %>%
   summarise(all_n = sum(n), 
             all_maj = sum(n[majority==1])) %>%
   mutate(n_pct = all_maj/all_n) %>%
-  ggplot(aes(term, n_pct)) + geom_line() + scale_y_continuous(labels=scales::percent, limits=c(0,NA)) +labs(title= "Percent of Time Scalia was in the Majority", x = "Term", y= "Percent of Total Decisions")
+  ggplot(aes(term, n_pct)) + geom_line() + scale_y_continuous(labels=scales::percent, limits=c(0,NA)) +
+  labs(title= "Percent of Time Scalia was in the Majority", x = "Term", y= "Percent of Total Decisions")
   
 
 ```
@@ -83,7 +84,11 @@ scdbv3 <- scdbv %>%
   mutate(n_pct = maj/n, 
          type = factor(type, levels = c("all", "nonUnani"), labels = c("All Decisions", "Non-Unanimous Decisions")))
   
-ggplot(scdbv3, aes(term, n_pct, color=type))+geom_line()+scale_y_continuous(labels = scales::percent, limits=c(0,NA))+ labs(titles = "Percent of Time Scalia was in the Majority", x="Term", y = "Percent of Total Decisions") + theme(legend.position="bottom")
+ggplot(scdbv3, aes(term, n_pct, color=type))+
+  geom_line()+
+  scale_y_continuous(labels = scales::percent, limits=c(0,NA))+ 
+  labs(titles = "Percent of Time Scalia was in the Majority", x="Term", y = "Percent of Total Decisions") + 
+  theme(legend.position="bottom")
 
 ```
 
@@ -99,25 +104,15 @@ scdbv4%>%
   count(decisionDirection) %>% 
   mutate(percent = n / sum(n))%>%
   filter(decisionDirection == 1) %>%
-  ggplot(aes(term, percent))+ geom_line() + labs(title= "Percent of US Supreme Court Cases Won in a Conservative Direction", x = "Term", y = "Percent of Cases")
+  ggplot(aes(term, percent))+ 
+  geom_line() + 
+  labs(title= "Percent of US Supreme Court Cases Won in a Conservative Direction", x = "Term", y = "Percent of Cases") +
+  scale_y_continuous(labels = scales::percent, limits=c(0,NA))
 ```
 
 ## In each term, how many of the term's published decisions were announced in a given month?
 
 ```{r}
-scdbv %>%
-  unique()%>%
-  select(term, dateDecision) %>%
-  mutate(Month = dateDecision) %>%
-  separate(Month, into = c("month", "day", "year")) %>%
-  select(term, dateDecision, month) %>%
-  mutate(month =factor(month, levels = c(1:12), labels = c(month.abb)))%>%
- count(term, month) %>%
-  ggplot(aes(month, n)) + geom_boxplot() +coord_flip()
-
-#this is still wrong but I'm close
-
-
 
 scdbv %>%
   unique()%>%
@@ -128,7 +123,9 @@ scdbv %>%
   mutate(month =factor(month, levels = c(1:12), labels = c(month.abb)))%>%
   group_by(term)%>%
  count(term, month) %>%
-  ggplot(aes(month, n)) + geom_boxplot() +coord_flip() 
+  ggplot(aes(month, n))+ 
+  geom_boxplot() +
+  coord_flip() 
 
 ```
 
@@ -144,8 +141,12 @@ scdbv6%>%
   count(decisionDirection) %>% 
   mutate(percent = n / sum(n))%>%
   filter(decisionDirection == 1)  %>%
-  ggplot(aes(x = term, y = percent))+ geom_line()+ facet_wrap(~chief)
-
+  group_by(chief) %>%
+  ggplot(aes(x = term, y = percent))+
+  geom_path()+ 
+  facet_wrap(~chief) + 
+  labs(title = "Percent of Supreme Court Cases Decided in a Conservative Direction", subtitle = "Showing Chief Justice for a Given Term", y = "Percent of Cases", x = "Term") +
+  scale_y_continuous(labels = scales::percent, limits=c(0,NA)) 
 
 ```
 
