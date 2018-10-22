@@ -30,6 +30,7 @@ scdbv <- bind_rows(scdbv_leg, scdbv_mod)
 scdbv <- scdbv %>%
 mutate(majority = majority -1, datadecisionDirection = ifelse(decisionDirection == 3, NA, decisionDirection -1), justiceName = as.factor(justiceName),
          chief = as.factor(chief))
+
 ```
 
 ## What percentage of cases in each term are decided by a one-vote margin (i.e. 5-4, 4-3, etc.)
@@ -95,19 +96,25 @@ ggplot(scdbv3, aes(term, n_pct, color=type))+
 ## In each term, what percentage of cases were decided in the conservative direction?
 
 ```{r}
+#combine data sets
+question4 <- bind_rows(scdbv_leg, scdbv_mod)
+
+question4 %>%
+  count(term, decisionDirection)%>%
+  group_by(term) %>%
+  na.omit %>%
+  summarize(all_n =sum(n),
+            conservative = sum(n[decisionDirection == 1])) %>%
+  ggplot(aes(term,conservative/all_n)) + 
+  geom_line()+
+  labs(title= "Percent of US Supreme Court Cases Won in a Conservative Direction", x = "Term", y = "Percent of Cases") +
+  scale_y_continuous(labels = scales::percent, limits=c(0,NA))
+
 scdbv4 <- scdbv %>%
   select(term, caseId, partyWinning, decisionDirection) %>% #select only the terms I want
   unique() %>%
   group_by(term)
 
-scdbv4%>%
-  count(decisionDirection) %>% 
-  mutate(percent = n / sum(n))%>%
-  filter(decisionDirection == 1) %>%
-  ggplot(aes(term, percent))+ 
-  geom_line() + 
-  labs(title= "Percent of US Supreme Court Cases Won in a Conservative Direction", x = "Term", y = "Percent of Cases") +
-  scale_y_continuous(labels = scales::percent, limits=c(0,NA))
 ```
 
 ## In each term, how many of the term's published decisions were announced in a given month?
@@ -127,6 +134,45 @@ scdbv %>%
   geom_boxplot() +
   coord_flip() 
 
+
+scdbv%>%
+  unique()%>%
+  select(term, dateDecision)%>%
+  
+
+
+library(lubridate)
+scdbv %>%
+  mutate(decision_month=month(mdy(dateDecision)), factor(decision_month, labels = month.abb))%>%
+  group_by(decision_month)%>%
+  summarize(avg_decision = n()) %>%
+mutate(decision_month =factor(decision_month, levels = c(1:12), labels = c(month.abb)))%>%
+ 
+  count(decision_month) %>%
+  ggplot(aes(decision_month, n))+ 
+  geom_boxplot() +
+  coord_flip() 
+
+
+test5 <- scdbv%>%
+  mutate(decision_month = month(mdy(dateDecision))) %>%
+  mutate(decision_month = factor(decision_month, labels = month.name))
+
+test6 <- test5 %>%
+  select(term, decision_month, caseIssuesId)
+
+test7 <- test6[!duplicated(test6$caseIssuesId),] %>%
+  group_by(term, decision_month) %>%
+  summarise(total_count = n())
+
+ggplot(test7, aes(decision_month, total_count)) +
+  geom_boxplot()+
+  coord_flip() +
+  labs(title = "Number of Published Decisions Per Month, by Term", x = "Term Month", y = "Number of Published Decisions in a Term-Month")
+
+
+
+test7
 ```
 
 ## The Chief Justice is frequently seen as capable of influencing the ideological direction of the Court. Create a graph similar to the one above that also incorporates information on who was the Chief Justice during the term.
