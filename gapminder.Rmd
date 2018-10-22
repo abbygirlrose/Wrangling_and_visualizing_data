@@ -33,7 +33,7 @@ inner_join(gapminder, hiv) %>%
 # Which continents have the most countries with missing HIV data?
 
 ```{r}
-left_join(gapminder, hiv) %>%
+left_join(gapminder, hiv) %>% #keep all of gapminder
   filter(is.na(hivRate))%>%
   count(continent) %>%
   ggplot(aes(reorder(continent, -n), n)) + geom_col()+ labs(title = "Missing Observations by Country", x = "Continent", y = "Number of Missing Observations")

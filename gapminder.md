@@ -9,14 +9,14 @@ Get the original data
 library(tidyverse)
 ```
 
-    ## ── Attaching packages ────────────── tidyverse 1.2.1 ──
+    ## ── Attaching packages ──────────────────────────────── tidyverse 1.2.1 ──
 
     ## ✔ ggplot2 3.0.0     ✔ purrr   0.2.5
     ## ✔ tibble  1.4.2     ✔ dplyr   0.7.6
     ## ✔ tidyr   0.8.1     ✔ stringr 1.3.1
     ## ✔ readr   1.1.1     ✔ forcats 0.3.0
 
-    ## ── Conflicts ───────────────── tidyverse_conflicts() ──
+    ## ── Conflicts ─────────────────────────────────── tidyverse_conflicts() ──
     ## ✖ dplyr::filter() masks stats::filter()
     ## ✖ dplyr::lag()    masks stats::lag()
 
@@ -78,7 +78,7 @@ Which continents have the most countries with missing HIV data?
 ===============================================================
 
 ``` r
-left_join(gapminder, hiv) %>%
+left_join(gapminder, hiv) %>% #keep all of gapminder
   filter(is.na(hivRate))%>%
   count(continent) %>%
   ggplot(aes(reorder(continent, -n), n)) + geom_col()+ labs(title = "Missing Observations by Country", x = "Continent", y = "Number of Missing Observations")
@@ -113,7 +113,7 @@ devtools::session_info()
     ##  language (EN)                        
     ##  collate  en_US.UTF-8                 
     ##  tz       America/Chicago             
-    ##  date     2018-10-21
+    ##  date     2018-10-22
 
     ## Packages -----------------------------------------------------------------
 
